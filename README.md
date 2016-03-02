@@ -59,19 +59,25 @@ Configuration is self-describing, just copy *config.example.json* to *config.jso
 "upstream": [
   {
     "pool": true,
-    "name": "EuroHash.net",
-    "url": "http://eth-eu.eurohash.net:8888/miner/0xb85150eb365e7df0941f0cf08235f987ba91506a/proxy",
+    "name": "NiceHash as primary pool",
+    "url": "http://ethereum.eu.nicehash.com:3500/n1c3-1CzrFvvieNaZg5aMHkb8eAPCSeVVUfUpax.myproxy/250",
     "timeout": "10s"
   },
   {
-    "name": "backup-geth",
+    "pool": true,
+    "name": "SuprNova as secondary pool",
+    "url": "http://eth-mine.suprnova.cc:3000/myusername.myproxy/250",
+    "timeout": "10s"
+  },
+  {
+    "name": "local geth wallet as backup",
     "url": "http://127.0.0.1:8545",
     "timeout": "10s"
   }
 ],
 ```
 
-In this example we specified [EuroHash.net](https://eurohash.net) mining pool as main mining target and a local geth node as backup for solo.
+In this example we specified [NiceHash](https://www.nicehash.com) mining pool as main primary mining target. Additionally we specified [suprnova.cc](https://eth.suprnova.cc) and a local geth node as backup.
 
 With <code>"submitHashrate": true|false</code> proxy will forward <code>eth_submitHashrate</code> requests to upstream.
 
@@ -79,34 +85,34 @@ With <code>"submitHashrate": true|false</code> proxy will forward <code>eth_subm
 
     ./ether-proxy config.json
 
-#### Mining
+#### Connecting and mining with ethminer to the proxy
 
-    ethminer -F http://x.x.x.x:8546/miner/5/gpu-rig -G
-    ethminer -F http://x.x.x.x:8546/miner/0.1/cpu-rig -C
+The syntax is:
+
+    ethminer -G -F http://x.x.x.x:8546/miner/N/X
+
+where N = desired difficulty (approximately expected rig hashrate, divided by 2) and X is the name of the rig.
+
+Examples for one AMD and one NVIDIA rig:
+
+    ethminer -G -F http://x.x.x.x:8546/miner/50/myamdrig
+    ethminer -U -F http://x.x.x.x:8546/miner/30/mynvidiarig
 
 ### Pools that work with this proxy
 
-* [EuroHash.net](https://eurohash.net) EU Ethereum mining pool
-* [SuprNova.cc](https://eth.suprnova.cc) SuprNova ETH Pool
-
-Pool owners, apply for listing here. PM me for implementation details.
+* [NiceHash](https://www.nicehash.com) NiceHash Ethereum pool with auto-convert to Bitcoin
+* [suprnova.cc](https://eth.suprnova.cc) suprnova.cc Ethereum pool
 
 ### TODO
-
-**Currently it's solo-only solution.**
 
 * Report block numbers
 * Report luck per rig
 * Maybe add more stats
 * Maybe add charts
 
-### Donations
+### Acknowlegments
 
-* **ETH**: [0xb85150eb365e7df0941f0cf08235f987ba91506a](https://etherchain.org/account/0xb85150eb365e7df0941f0cf08235f987ba91506a)
-
-* **BTC**: [1PYqZATFuYAKS65dbzrGhkrvoN9au7WBj8](https://blockchain.info/address/1PYqZATFuYAKS65dbzrGhkrvoN9au7WBj8)
-
-Thanks to a couple of dudes who donated some Ether to me, I believe, you can do the same.
+Forked from [sammy007's ethere-proxy](https://github.com/sammy007/ether-proxy), all credits goes to sammy007.
 
 ### License
 
