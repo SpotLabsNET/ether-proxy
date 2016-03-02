@@ -1,79 +1,96 @@
-# ether-proxy
+# EtherProxy for NiceHash and Ethereum mining pools
 
-Ethereum mining proxy with web-interface.
+This is an Ethereum mining proxy with simple web interface.
 
-**Proxy feature list:**
-
-* Rigs availability monitoring
-* Keep track of accepts, rejects, blocks stats
-* Easy detection of sick rigs
-* Daemon failover list
+- [Features](#features)
+- [Building on Linux](#buildingonlinux)
+- [Building on Windows](#buildingonwindows)
+- [Building on Mac OS X](#buildingonmacosx)
+- [Configuration](#configuration)
+- [Example upstream section](#exampleupstream)
+- [Running](#running)
+- [Connecting and mining with ethminer to the proxy](#connectingandmining)
+- [JSON API stats](#jsonapistats)
+- [Pools that work with this proxy](#supportedpools)
+- [TODO](#todo)
+- [Acknowledgements](#acknowledgements)
+- [License](#license)
 
 ![Demo](https://raw.githubusercontent.com/sammy007/ether-proxy/master/proxy.png)
 
-### Building on Linux
+### <a name="features"></a> Features
+
+* Increases efficiency and profitability by aggregating work from several miners on a single connection to the pool.
+* Simple web interface with statistics.
+* Rigs availability monitoring.
+* Keep track of accepts, rejects, blocks stats.
+* Easy detection of sick rigs.
+* Daemon failover list.
+* JSON stats output.
+
+### <a name="buildingonlinux"></a> Building on Linux
 
 Dependencies:
 
-  * go >= 1.4
-  * geth
+* go >= 1.4
+* geth
 
 Export GOPATH:
 
-    export GOPATH=$HOME/go
+export GOPATH=$HOME/go
 
 Install required packages:
 
-    go get github.com/ethereum/ethash
-    go get github.com/ethereum/go-ethereum/common
-    go get github.com/goji/httpauth
-    go get github.com/gorilla/mux
-    go get github.com/yvasiyarov/gorelic
+go get github.com/ethereum/ethash
+go get github.com/ethereum/go-ethereum/common
+go get github.com/goji/httpauth
+go get github.com/gorilla/mux
+go get github.com/yvasiyarov/gorelic
 
 Compile:
 
-    go build -o ether-proxy main.go
+go build -o ether-proxy main.go
 
-### Building on Windows
+### <a name="buildingonwindows"></a> Building on Windows
 
 Follow [this wiki paragraph](https://github.com/ethereum/go-ethereum/wiki/Installation-instructions-for-Windows#building-from-source) in order to prepare your environment.
 Install required packages (look at Linux install guide above). Then compile:
 
-    go build -o ether-proxy.exe main.go
+go build -o ether-proxy.exe main.go
 
-### Building on Mac OS X
+### <a name="buildingonmacosx"></a> Building on Mac OS X
 
 If you didn't install [Brew](http://brew.sh/), do it. Then install Golang:
 
-    brew install go
+brew install go
 
 And follow Linux installation instructions because they are the same for OS X.
 
-### Configuration
+### <a name="configuration"></a> Configuration
 
 Configuration is self-describing, just copy *config.example.json* to *config.json* and specify endpoint URL and upstream URLs.
 
-#### Example upstream section
+#### <a name="exampleupstream"></a> Example upstream section
 
 ```javascript
 "upstream": [
-  {
-    "pool": true,
-    "name": "NiceHash as primary pool",
-    "url": "http://ethereum.eu.nicehash.com:3500/n1c3-1CzrFvvieNaZg5aMHkb8eAPCSeVVUfUpax.myproxy/250",
-    "timeout": "10s"
-  },
-  {
-    "pool": true,
-    "name": "SuprNova as secondary pool",
-    "url": "http://eth-mine.suprnova.cc:3000/myusername.myproxy/250",
-    "timeout": "10s"
-  },
-  {
-    "name": "local geth wallet as backup",
-    "url": "http://127.0.0.1:8545",
-    "timeout": "10s"
-  }
+{
+"pool": true,
+"name": "NiceHash as primary pool",
+"url": "http://ethereum.eu.nicehash.com:3500/n1c3-1CzrFvvieNaZg5aMHkb8eAPCSeVVUfUpax.myproxy/250",
+"timeout": "10s"
+},
+{
+"pool": true,
+"name": "suprnova.cc as secondary pool",
+"url": "http://eth-mine.suprnova.cc:3000/myusername.myproxy/250",
+"timeout": "10s"
+},
+{
+"name": "local geth wallet as backup",
+"url": "http://127.0.0.1:8545",
+"timeout": "10s"
+}
 ],
 ```
 
@@ -81,39 +98,45 @@ In this example we specified [NiceHash](https://www.nicehash.com) mining pool as
 
 With <code>"submitHashrate": true|false</code> proxy will forward <code>eth_submitHashrate</code> requests to upstream.
 
-#### Running
+#### <a name="running"></a> Running
 
-    ./ether-proxy config.json
+./ether-proxy config.json
 
-#### Connecting and mining with ethminer to the proxy
+#### <a name="connectingandmining"></a> Connecting and mining with ethminer to the proxy
 
 The syntax is:
 
-    ethminer -G -F http://x.x.x.x:8546/miner/N/X
+ethminer -G -F http://x.x.x.x:8546/miner/N/X
 
 where N = desired difficulty (approximately expected rig hashrate, divided by 2) and X is the name of the rig.
 
-Examples for one AMD and one NVIDIA rig:
+Examples for one AMD and one NVIDIA rig with multiple GPUs:
 
-    ethminer -G -F http://x.x.x.x:8546/miner/50/myamdrig
-    ethminer -U -F http://x.x.x.x:8546/miner/30/mynvidiarig
+ethminer -G -F http://x.x.x.x:8546/miner/50/myamdrig
+ethminer -U -F http://x.x.x.x:8546/miner/30/mynvidiarig
 
-### Pools that work with this proxy
+### <a name="jsonapistats"></a> JSON API stats
 
-* [NiceHash](https://www.nicehash.com) NiceHash Ethereum pool with auto-convert to Bitcoin
-* [suprnova.cc](https://eth.suprnova.cc) suprnova.cc Ethereum pool
+Point your browser to the stats page according to "frontend" settings in config.json:
 
-### TODO
+http://x.x.x.x:8080/stats
+
+### <a name="supportedpools"></a> Pools that work with this proxy
+
+* [NiceHash](https://www.nicehash.com) Ethereum pool with auto-convert to Bitcoin
+* [suprnova.cc](https://eth.suprnova.cc) Ethereum pool
+
+### <a name="todo"></a> TODO
 
 * Report block numbers
 * Report luck per rig
 * Maybe add more stats
 * Maybe add charts
 
-### Acknowlegments
+### <a name="acknowledgements"></a> Acknowledgements
 
 Forked from [sammy007's ethere-proxy](https://github.com/sammy007/ether-proxy), all credits goes to sammy007.
 
-### License
+### <a name="license"></a> License
 
 The MIT License (MIT).
